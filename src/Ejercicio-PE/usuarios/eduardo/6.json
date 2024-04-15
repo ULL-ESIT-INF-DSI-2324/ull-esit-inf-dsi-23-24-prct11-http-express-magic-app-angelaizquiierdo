@@ -1,0 +1,10 @@
+{
+ "id": 6,
+ "nombre": "Pokemon-Pikachu",
+ "costemana": 5,
+ "color": "Rojo",
+ "lineatipo": "Instantaneo",
+ "rareza": "Rara",
+ "reglas": "reglas",
+ "valorMercado": 1
+}

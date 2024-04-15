@@ -1,0 +1,12 @@
+{
+ "id": 2,
+ "nombre": "Pokemon-Charizard",
+ "costemana": 5,
+ "color": "Rojo",
+ "lineatipo": "Criatura",
+ "rareza": "Comun",
+ "reglas": "reglas",
+ "fuerza": 1,
+ "resistencia": 1,
+ "valorMercado": 1
+}
