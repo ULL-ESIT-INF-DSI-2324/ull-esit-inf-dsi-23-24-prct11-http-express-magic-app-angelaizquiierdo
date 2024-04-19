@@ -82,12 +82,6 @@ export class Carta implements Interfazcarta {
     public marcasLealtad: number | undefined,
     public valorMercado: number,
   ) {
-    this.id = id;
-    this.nombre = nombre;
-    this.costemana = costemana;
-    this.color = color;
-    this.lineatipo = lineatipo;
-    this.rareza = rareza;
     if (this.lineatipo === LineaTipo.Criatura) {
       if (fuerza === undefined || resistencia === undefined) {
         throw new Error(
@@ -109,8 +103,56 @@ export class Carta implements Interfazcarta {
   costeMana: number;
   Lineatipo: LineaTipo;
   textoReglas: string;
-
 }
 
 
 
+/**
+ * Muestra los detalles de una carta.
+ * @param carta - La carta a mostrar.
+ */
+export function MostrarCartas(carta: string): void {
+  const carta_json = JSON.parse(carta); // Convertir el string a JSON
+  let resultado = '';
+  resultado += `Id: ${carta_json.id}\n`;
+  resultado += `Nombre: ${carta_json.nombre}\n`;
+  resultado += `Coste de maná: ${carta_json.coste_mana}\n`;
+  resultado += `Color: ${carta_json.color}\n`;
+  resultado += `Linea de tipo: ${carta_json.tipo}\n`;
+  resultado += `Rareza: ${carta_json.rareza}\n`;
+  resultado += `Texto de reglas: ${carta_json.texto_reglas}\n`;
+  if (carta_json.tipo === 'Criatura') { // Mostrar la fuerza y resistencia de la criatura
+      resultado += `Fuerza/Resistencia: ${carta_json.fuerza_resistencia}\n`;
+  }
+  if (carta_json.tipo === 'Planeswalker') { // Mostrar las marcas de lealtad del planeswalker
+      resultado += `Marcas de lealtad: ${carta_json.marcas_lealtad}\n`;
+  }
+  resultado += `Valor de mercado: ${carta_json.valor_mercado}\n`;
+
+  switch (carta_json.color) { // Mostrar el color de la carta
+      case 'Blanco':
+          console.log(chalk.white(resultado));
+          break;
+      case 'Azul':
+          console.log(chalk.blue(resultado));
+          break;
+      case 'Negro':
+          console.log(chalk.black(resultado));
+          break;
+      case 'Rojo':
+          console.log(chalk.red(resultado));
+          break;
+      case 'Verde':
+          console.log(chalk.green(resultado));
+          break;
+      case 'Incoloro':
+          console.log(chalk.gray(resultado));
+          break;
+      case 'Multicolor':
+          console.log(chalk.yellow(resultado));
+          break;
+      default:
+          console.log(chalk.red('No se reconoce el color!'));
+          break;
+  }
+}
