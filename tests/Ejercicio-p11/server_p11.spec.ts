@@ -2,6 +2,7 @@ import "mocha";
 import fs from "fs";
 import { expect } from "chai";
 import request from "request";
+import { Rareza } from "../../src/Ejercicio_p11/cartas_magic";
 
 // Ruta del directorio de cartas y archivo a eliminar
 const directorioCartasUsuario = "./cards/eva";
@@ -211,13 +212,16 @@ describe("Pruebas de las rutas de la aplicación Express", () => {
   it(" Test 13 - no debería actualizar una carta a un usuario si no existe", (done) => {
     const cardToAdd = {
       id: 99,
-      name: "Qiyana",
+      name: "Dragón de Fuego Abrasador",
       manaCost: 6767,
-      color: "White",
-      type: "Artifact",
-      rarity: "Rare",
-      rulesText: "Tap: ERQWQAA",
-      marketValue: 999,
+      color: "Rojo",
+      lineatipo: "Criatura",
+      rareza: "Mitica",
+      reglas:
+        "Un poderoso dragón que desata llamas ardientes sobre sus enemigos al entrar al campo de batalla.",
+      fuerza: 5,
+      resistencia: 4,
+      valorMercado: 500,
     };
     request.patch(
       {
