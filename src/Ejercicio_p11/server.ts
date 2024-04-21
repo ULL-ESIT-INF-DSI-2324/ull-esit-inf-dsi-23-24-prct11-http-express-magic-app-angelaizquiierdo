@@ -172,16 +172,3 @@ app.patch("/cards", (req, res) => {
 app.listen(3000, () => {
   console.log("El servidor está activo en el puerto 3000.");
 });
-
-// // Lógica para detener el servidor
-// function stopServer() {
-//   server.close(() => {
-//     console.log("El servidor ha sido detenido.");
-//   });
-// }
-
-// // Llama a la función stopServer para detener el servidor cuando sea necesario
-// // Por ejemplo, cuando recibas una señal SIGINT (Ctrl + C)
-// process.on("SIGINT", () => {
-//   stopServer();
-// });

@@ -70,22 +70,213 @@ export const ActualizarCarta = (
 
 ```
 
-Como el guión describe 
+### Como el guión describe 
 
 > Todas las peticiones deberán llevarse a cabo a partir de la ruta `/cards` y, además, deberán utilizarse los siguientes verbos HTTP para definir la manera en la que el servidor atenderá cada petición hecha en la ruta anterior:
 
-get: Para obtener información sobre una carta de la colección de un usuario o para listar todas las cartas de su colección. En este caso, el ID de la carta vendrá dado, junto al usuario, como parámetros de la query string de la petición. Si no se especifica un ID concreto, se estará indicando que se desea obtener la colección completa de cartas del usuario.
+- get: Para obtener información sobre una carta de la colección de un usuario o para listar todas las cartas de su colección. En este caso, el ID de la carta vendrá dado, junto al usuario, como parámetros de la query string de la petición. Si no se especifica un ID concreto, se estará indicando que se desea obtener la colección completa de cartas del usuario.
 
-post: Para añadir una carta a la colección de un usuario. En este caso, la carta que se desea añadir a la colección deberá venir especificada en formato JSON en el cuerpo de la petición. El usuario deberá indicarse en la query string de la petición.
+- post: Para añadir una carta a la colección de un usuario. En este caso, la carta que se desea añadir a la colección deberá venir especificada en formato JSON en el cuerpo de la petición. El usuario deberá indicarse en la query string de la petición.
 
-delete: Para eliminar una carta de la colección de un usuario. En este caso, el ID de la carta que se desea eliminar vendrá dado, junto al usuario, como parámetros de la query string de la petición.
+- delete: Para eliminar una carta de la colección de un usuario. En este caso, el ID de la carta que se desea eliminar vendrá dado, junto al usuario, como parámetros de la query string de la petición.
 
-patch: Para modificar la información de una carta existente en la colección de un usuario. En este caso, el ID de la carta que se desea modificar vendrá dado, junto al usuario, como parámetros de la query string de la petición. Además, la información a modificar se especificará en formato JSON en el cuerpo de la petición.
+- patch: Para modificar la información de una carta existente en la colección de un usuario. En este caso, el ID de la carta que se desea modificar vendrá dado, junto al usuario, como parámetros de la query string de la petición. Además, la información a modificar se especificará en formato JSON en el cuerpo de la petición.
 
-El resto de las funciones se mantienen igual que la práctica 10. 
+###
+Dando como resultado este código: 
+```ts
+const app = express();
 
-En cuanto a la implementacion de express
+app.use(express.json());
 
-## Conclusion
 
-## Bibliografía
+app.get("/cards", (req, res) => {
+  if (!req.query.usuario) {
+    res.send({
+      status: "ERROR",
+      answer: "Falta parametro de usuario en la solicitud",
+    });
+    return;
+  }
+  if (req.query.id) {
+    MostrarCarta(
+      req.query.usuario as string,
+      parseInt(req.query.id as string),
+      (error, result) => {
+        if (error) {
+          res.send(JSON.stringify({ status: "ERROR", answer: error }));
+        } else {
+          res.send(JSON.stringify({ status: "EXITO", answer: result }));
+        }
+      },
+    );
+  } else {
+    CargarCartas(req.query.usuario as string, (error, result) => {
+      if (error) {
+        res.send(JSON.stringify({ status: "ERROR", answer: error }));
+      } else {
+        let respuesta: string = "";
+        const resultado: Carta[] = result as Carta[];
+        resultado.forEach((carta) => {
+          respuesta += JSON.stringify(carta) + "\n";
+        });
+        res.send(JSON.stringify({ status: "EXITO", answer: respuesta }));
+      }
+    });
+  }
+});
+
+app.post("/cards", (req, res) => {
+  if (!req.query.usuario) {
+    res.send({
+      status: "ERROR",
+      answer: "Falta parametro de usuario en la solicitud",
+    });
+  } else {
+    ConversiorJSONaCarta(req.body, (errorCarta, carta) => {
+      if (errorCarta) {
+        res.send(JSON.stringify({ status: "ERROR", answer: errorCarta }));
+      } else {
+        GuardarCarta(
+          req.query.usuario as string,
+          carta as Carta,
+          (error, result) => {
+            if (error) {
+              res.send(JSON.stringify({ status: "ERROR", answer: error }));
+            } else {
+              res.send(JSON.stringify({ status: "EXITO", answer: result }));
+            }
+          },
+        );
+      }
+    });
+  }
+});
+
+app.delete("/cards", (req, res) => {
+  if (!req.query.usuario) {
+    res.send({
+      status: "ERROR",
+      answer: "Falta parametro de usuario en la solicitud",
+    });
+    return;
+  }
+  if (!req.query.id) {
+    res.send({
+      status: "ERROR",
+      answer: "Falta parametro de id en la solicitud",
+    });
+  } else {
+    EliminarCarta(
+      req.query.usuario as string,
+      parseInt(req.query.id as string),
+      (error, result) => {
+        if (error) {
+          res.send(JSON.stringify({ status: "ERROR", answer: error }));
+        } else {
+          res.send(JSON.stringify({ status: "EXITO", answer: result }));
+        }
+      },
+    );
+  }
+});
+
+
+app.patch("/cards", (req, res) => {
+  if (!req.query.usuario) {
+    res.send({
+      status: "ERROR",
+      answer: "Falta parametro de usuario en la solicitud",
+    });
+    return;
+  }
+  if (!req.query.id) {
+    res.send({
+      status: "ERROR",
+      answer: "Falta parametro de id en la solicitud",
+    });
+  } else {
+    // Verifica si el id en el cuerpo coincide con el id en la cadena de consulta
+    if (parseInt(req.query.id as string) !== req.body.id) {
+      res.send({
+        status: "ERROR",
+        answer:
+          "La identificación en el cuerpo debe ser la misma que la de la cadena de consulta.",
+      });
+      return;
+    }
+    // Llama a la función para modificar la carta
+    ConversiorJSONaCarta(req.body, (errorCarta, carta) => {
+      if (errorCarta) {
+        res.send(JSON.stringify({ status: "ERROR", answer: errorCarta }));
+      } else {
+        console.log(MostrarCartas(JSON.stringify(carta)));
+        ActualizarCarta(
+          req.query.usuario as string,
+          parseInt(req.query.id as string),
+          carta as Carta,
+          (error, result) => {
+            if (error) {
+              res.send(JSON.stringify({ status: "ERROR", answer: error }));
+            } else {
+              res.send(JSON.stringify({ status: "EXITO", answer: result }));
+            }
+          },
+        );
+      }
+    });
+  }
+});
+
+app.listen(3000, () => {
+  console.log("El servidor está activo en el puerto 3000.");
+});
+```
+
+Se procede a explicar la estructura que sigo en las peticiones HTTP con Express en este caso es una estructura clara y bien organizada que sigue los principios de enrutamiento y manejo de solicitudes de Express. 
+
+En primer lugar, inicializamos una instancia de Express para crear nuestro servidor. Luego, establecemos una ruta en **./cards** para manejar diversas solicitudes HTTP.
+
+Asociamos diferentes tipos de solicitudes con esta ruta para realizar acciones específicas. Es decir, inspeccionamos los parámetros de la **query string** para determinar qué acción tomar.
+
+Para la solicitud GET, verificamos el número de parámetros en la query string para discernir entre realizar la acción de `MostrarCarta` o `CargarCartas`. Si se busca visualizar una carta específica, examinamos el campo **'id'** en la **query string** para identificarla.
+
+Todas las respuestas del servidor están en formato JSON y siguen la misma estructura 
+`{ status, answer }`. 
+El campo **status**: indica si la operación fue exitosa o si ocurrió un error.
+El campo **answer**: proporciona detalles adicionales o el resultado de la operación, en el caso de las solicitudes GET donde se llama a la funcion **JSON.stringify**  objeto `Carta` o `Carta[]` en una cadena JSON.
+
+He implementado una función denominada `ConversiorJSONaCarta` con el propósito de convertir objetos JSON provenientes del **body** de las solicitudes en instancias de la clase Carta. Esta abstracción resulta sumamente útil para gestionar datos en formato JSON en las solicitudes entrantes del servidor, facilitando así su manipulación como objetos dentro del código. Este enfoque, además de proporcionar una mayor robustez a la aplicación, simplifica el proceso de recepción y manipulación de datos.
+
+
+```ts
+export function ConversiorJSONaCarta(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  nueva_carta: any,
+  callback: (error: Error | undefined, carta: Carta | undefined) => void,
+): void {
+  console.log(`Creando carta que contiene ${nueva_carta.id}`);
+  try {
+    const cartas_magicas = new Carta(
+      nueva_carta.id,
+      nueva_carta.nombre,
+      nueva_carta.coste_mana,
+      nueva_carta.color,
+      nueva_carta.lineatipo,
+      nueva_carta.rareza,
+      nueva_carta.reglas,
+      nueva_carta.fuerza,
+      nueva_carta.Resistencia,
+      nueva_carta.loyalty,
+      nueva_carta.valor_mercado,
+    );
+
+    callback(undefined, cartas_magicas);
+  } catch (error) {
+    callback(error, undefined);
+  }
+}
+```
+
+
+# Conclusion

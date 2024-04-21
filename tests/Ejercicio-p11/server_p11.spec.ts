@@ -21,10 +21,12 @@ describe("Pruebas de las rutas de la aplicación Express", () => {
   // Prueba para la ruta GET /cards
   it("Test 1 - get (no debería funcionar si el usuario no se da en la query string)", (done) => {
     request.get(
-      { url: "http://localhost:3000./cards", json: true },
+      { url: "http://localhost:3000/cards", json: true },
       (error: Error, response) => {
         expect(response.body.status).to.equal("ERROR");
-        expect(response.body.answer).to.equal("Se necesita el usuario");
+        expect(response.body.answer).to.equal(
+          "Falta parametro de usuario en la solicitud",
+        );
         done();
       },
     );
@@ -32,7 +34,7 @@ describe("Pruebas de las rutas de la aplicación Express", () => {
 
   it("Test 2 - get (debería obtener todas las cartas de un usuario)", (done) => {
     request.get(
-      { url: "http://localhost:3000./cards?usuario=eva", json: true },
+      { url: "http://localhost:3000/cards?usuario=eva", json: true },
       (error: Error, response) => {
         expect(response.body.status).to.equal("EXITO");
 
@@ -43,7 +45,7 @@ describe("Pruebas de las rutas de la aplicación Express", () => {
 
   it("Test 3 - get (debería obtener una carta de un usuario)", (done) => {
     request.get(
-      { url: "http://localhost:3000./cards?usuario=eva&id=6", json: true },
+      { url: "http://localhost:3000/cards?usuario=eva&id=6", json: true },
       (error: Error, response) => {
         expect(response.body.status).to.equal("EXITO");
         done();
@@ -54,7 +56,7 @@ describe("Pruebas de las rutas de la aplicación Express", () => {
   // Prueba para la ruta POST /cards
   it("Test 4 - post (no debería funcionar si el usuario no se da en la query string)", (done) => {
     request.post(
-      { url: "http://localhost:3000./cards", json: true },
+      { url: "http://localhost:3000/cards", json: true },
       (error: Error, response) => {
         expect(response.body.status).to.equal("ERROR");
         expect(response.body.answer).to.equal(
@@ -77,7 +79,7 @@ describe("Pruebas de las rutas de la aplicación Express", () => {
       valorMercado: 50,
     };
     request.post(
-      { url: "http://localhost:3000./cards?usuario=eva", json: cardToAdd },
+      { url: "http://localhost:3000/cards?usuario=eva", json: cardToAdd },
       (error: Error, response) => {
         expect(response.body.status).to.equal("EXITO");
         done();
@@ -88,17 +90,17 @@ describe("Pruebas de las rutas de la aplicación Express", () => {
     const cardToAdd = {
       id: 4,
       nombre: "Lightning Bolt",
-      costemana: 1, // Se corrigió el coste de mana a 1
+      costemana: 1,
       color: "Rojo",
       lineatipo: "Conjuro",
-      rareza: "Común", // Cambiado a común, ya que Lightning Bolt es común en la mayoría de los formatos
+      rareza: "Común",
       reglas:
         "Lightning Bolt es un hechizo rojo de daño directo que causa 3 puntos de daño a cualquier objetivo.",
       valorMercado: 50,
     };
 
     request.post(
-      { url: "http://localhost:3000./cards?usuario=eva", json: cardToAdd },
+      { url: "http://localhost:3000/cards?usuario=eva", json: cardToAdd },
       (error: Error, response) => {
         expect(response.body.status).to.equal("EXITO");
         done();
@@ -110,17 +112,17 @@ describe("Pruebas de las rutas de la aplicación Express", () => {
     const cardToAdd = {
       id: 4,
       nombre: "Lightning Bolt",
-      costemana: 1, // Se corrigió el coste de mana a 1
+      costemana: 1,
       color: "Rojo",
       lineatipo: "Conjuro",
-      rareza: "Común", // Cambiado a común, ya que Lightning Bolt es común en la mayoría de los formatos
+      rareza: "Común",
       reglas:
         "Lightning Bolt es un hechizo rojo de daño directo que causa 3 puntos de daño a cualquier objetivo.",
       valorMercado: 50,
     };
 
     request.post(
-      { url: "http://localhost:3000./cards?usuario=eva", json: cardToAdd },
+      { url: "http://localhost:3000/cards?usuario=eva", json: cardToAdd },
       (error: Error, response) => {
         expect(response.body.status).to.equal("ERROR");
         expect(response.body.answer).to.equal(
@@ -134,7 +136,7 @@ describe("Pruebas de las rutas de la aplicación Express", () => {
   // Prueba para la ruta DELETE /cards
   it("Test 8 - no debería funcionar si el usuario no se da en la query string", (done) => {
     request.delete(
-      { url: "http://localhost:3000./cards", json: true },
+      { url: "http://localhost:3000/cards", json: true },
       (error: Error, response) => {
         expect(response.body.status).to.equal("ERROR");
         expect(response.body.answer).to.equal(
@@ -146,7 +148,7 @@ describe("Pruebas de las rutas de la aplicación Express", () => {
   });
   it("Test 9 - debería eliminar una carta de un usuario", (done) => {
     request.delete(
-      { url: "http://localhost:3000./cards?usuario=eva&id=4", json: true },
+      { url: "http://localhost:3000/cards?usuario=eva&id=4", json: true },
       (error: Error, response) => {
         expect(response.body.status).to.equal("EXITO");
         expect(response.body.answer).to.equal(
@@ -158,7 +160,7 @@ describe("Pruebas de las rutas de la aplicación Express", () => {
   });
   it("Test 10 - no debería eliminar una carta de un usuario si no existe", (done) => {
     request.delete(
-      { url: "http://localhost:3000./cards?usuario=eva&id=999", json: true },
+      { url: "http://localhost:3000/cards?usuario=eva&id=999", json: true },
       (error: Error, response) => {
         expect(response.body.status).to.equal("ERROR");
         expect(response.body.answer).to.equal(
@@ -172,7 +174,7 @@ describe("Pruebas de las rutas de la aplicación Express", () => {
   // Prueba para la ruta PATCH /cards
   it("Test 11 - no debería funcionar si el usuario no se da en la query string", (done) => {
     request.patch(
-      { url: "http://localhost:3000./cards", json: true },
+      { url: "http://localhost:3000/cards", json: true },
       (error: Error, response) => {
         expect(response.body.status).to.equal("ERROR");
         expect(response.body.answer).to.equal(
@@ -196,7 +198,7 @@ describe("Pruebas de las rutas de la aplicación Express", () => {
     };
 
     request.patch(
-      { url: "http://localhost:3000./cards?usuario=eva&id=6", json: cardToAdd },
+      { url: "http://localhost:3000/cards?usuario=eva&id=6", json: cardToAdd },
       (error: Error, response) => {
         expect(response.body.status).to.equal("EXITO");
         expect(response.body.answer).to.equal(
@@ -219,7 +221,7 @@ describe("Pruebas de las rutas de la aplicación Express", () => {
     };
     request.patch(
       {
-        url: "http://localhost:3000./cards?usuario=eva&id=99",
+        url: "http://localhost:3000/cards?usuario=eva&id=99",
         json: cardToAdd,
       },
       (error: Error, response) => {

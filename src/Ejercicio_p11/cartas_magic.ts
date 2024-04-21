@@ -113,7 +113,6 @@ export class Carta implements Interfazcarta {
   textoReglas: string;
 }
 
-
 /**
  * Funcion que convierte un objeto JSON en un objeto de carta.
  * @param nueva_carta  El objeto JSON que contiene la información de la carta.
@@ -151,7 +150,13 @@ export function ConversiorJSONaCarta(
  * @param carta - La carta a mostrar.
  */
 export function MostrarCartas(carta: string): void {
+  if (!carta || carta.trim() === "{}") {
+    console.log("No hay contenido de carta para mostrar.");
+    return;
+  }
+
   const carta_json = JSON.parse(carta); // Convertir el string a JSON
+
   let resultado = "";
   resultado += `Id: ${carta_json.id}\n`;
   resultado += `Nombre: ${carta_json.nombre}\n`;
@@ -162,7 +167,8 @@ export function MostrarCartas(carta: string): void {
   resultado += `Texto de reglas: ${carta_json.texto_reglas}\n`;
   if (carta_json.tipo === "Criatura") {
     // Mostrar la fuerza y resistencia de la criatura
-    resultado += `Fuerza/Resistencia: ${carta_json.fuerza_resistencia}\n`;
+    resultado += `Fuerza: ${carta_json.fuerza}\n`;
+    resultado += `Resistencia: ${carta_json.resistencia}\n`;
   }
   if (carta_json.tipo === "Planeswalker") {
     // Mostrar las marcas de lealtad del planeswalker
