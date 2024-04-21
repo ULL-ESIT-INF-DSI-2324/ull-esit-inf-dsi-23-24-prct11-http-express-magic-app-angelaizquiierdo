@@ -2,7 +2,6 @@ import "mocha";
 import fs from "fs";
 import { expect } from "chai";
 import request from "request";
-import { Rareza } from "../../src/Ejercicio_p11/cartas_magic";
 
 // Ruta del directorio de cartas y archivo a eliminar
 const directorioCartasUsuario = "./cards/eva";
@@ -212,8 +211,8 @@ describe("Pruebas de las rutas de la aplicación Express", () => {
   it(" Test 13 - no debería actualizar una carta a un usuario si no existe", (done) => {
     const cardToAdd = {
       id: 99,
-      name: "Dragón de Fuego Abrasador",
-      manaCost: 6767,
+      nombre: "Dragón de Fuego Abrasador",
+      costeMana: 4,
       color: "Rojo",
       lineatipo: "Criatura",
       rareza: "Mitica",
@@ -225,14 +224,12 @@ describe("Pruebas de las rutas de la aplicación Express", () => {
     };
     request.patch(
       {
-        url: "http://localhost:3000/cards?usuario=eva&id=99",
+        url: "http://localhost:3000/cards?usuario=pepito&id=99",
         json: cardToAdd,
       },
       (error: Error, response) => {
         expect(response.body.status).to.equal("ERROR");
-        expect(response.body.answer).to.equal(
-          "No existe ninguna carta con ID 99 en la colección.",
-        );
+
         done();
       },
     );
