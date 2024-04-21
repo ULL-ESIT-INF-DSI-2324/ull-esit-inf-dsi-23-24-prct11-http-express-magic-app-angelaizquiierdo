@@ -2,8 +2,8 @@ import 'mocha';
 import {expect} from 'chai';
 
 import fs from "fs";
-import { Carta, Color, LineaTipo, Rareza } from "../src/Ejercicio-PE/cartas_magic.js";
-import { ActualizarCarta, Anadir } from "../src/Ejercicio-PE/gestor_carta.js";
+import { Carta, Color, LineaTipo, Rareza } from "../../src/Ejercicio-PE/cartas_magic.js";
+import { ActualizarCarta, Anadir } from "../../src/Ejercicio-PE/gestor_carta.js";
 
 
 describe('ActualizarCarta() promesas', () => {

@@ -13,15 +13,19 @@ export const GuardarCarta = (
   carta: Carta,
   callback: (err: string | undefined, data: string | undefined) => void,
 ) => {
-  const directorioUsuario = `./src/EjerciciosCarta/usuarios/${usuario}`;
+  const directorioUsuario = `./cartas/${usuario}`;
   const rutaCarta = `${directorioUsuario}/${carta.id}.json`;
 
-  // Verificar si existe el directorio del usuario
-  fs.access(directorioUsuario, fs.constants.F_OK, (err) => {
-    if (err) {
-      // Si no existe el directorio, crearlo y luego guardar la carta
+  // Verificar si el archivo ya existe
+  fs.access(rutaCarta, fs.constants.F_OK, (err) => {
+    if (!err) {
+      // Si el archivo ya existe, devolver un mensaje de error
+      callback(`El archivo para la carta ${carta.nombre} ya existe`, undefined);
+    } else {
+      // Si el archivo no existe, escribirlo en el directorio del usuario
       fs.mkdir(directorioUsuario, { recursive: true }, (err) => {
         if (err) {
+          
           callback(`Error al crear el directorio: ${err.message}`, undefined);
         } else {
           fs.writeFile(rutaCarta, JSON.stringify(carta), (err) => {
@@ -34,18 +38,6 @@ export const GuardarCarta = (
               );
             }
           });
-        }
-      });
-    } else {
-      // Si existe el directorio del usuario, guardar la carta
-      fs.writeFile(rutaCarta, JSON.stringify(carta), (err) => {
-        if (err) {
-          callback(`Error al guardar la carta: ${err.message}`, undefined);
-        } else {
-          callback(
-            undefined,
-            `Se ha guardado correctamente en el usuario: ${usuario}`,
-          );
         }
       });
     }
@@ -64,7 +56,7 @@ export const CargarCartas = (
     coleccioncartas: Carta[] | undefined,
   ) => void,
 ) => {
-  const directorioUsuario = `./src/EjerciciosCarta/usuarios/${usuario}`;
+  const directorioUsuario = `./cartas/${usuario}`;
 
   fs.access(directorioUsuario, fs.constants.F_OK, (err) => {
     if (err) {
@@ -134,15 +126,16 @@ export const MostrarCarta = (
         (carta) => carta.id === id,
       );
       if (index !== -1) {
-      
         try {
           const cartaobject: Carta = cartascoleccion[index];
           //cartaJson = JSON.stringify(cartascoleccion[index]);
           callback(undefined, cartaobject);
-        } catch (error){
-          callback(`Error al convertir el JSON del archivo ${id}: ${error.message}`, undefined);
+        } catch (error) {
+          callback(
+            `Error(MOSTRAR Carta) no se convirtio el JSON del archivo ${id}: ${error.message}`,
+            undefined,
+          );
         }
-        
       } else {
         callback(
           `No existe ninguna carta con ID ${id} en la colección.`,
@@ -166,13 +159,17 @@ export const EliminarCarta = (
 ) => {
   CargarCartas(usuario, (err, coleccion) => {
     if (err) {
-      callback(err, undefined);
+      callback(
+        `Error no existe usuario registrado con nombre ${usuario}`,
+        undefined,
+      );
     } else {
       const coleccioncarta: Carta[] = coleccion as Carta[];
+
       const index = coleccioncarta.findIndex((carta) => carta.id === id);
       if (index !== -1) {
         coleccioncarta.splice(index, 1);
-        const filePath = `./src/EjerciciosCarta/usuarios/${usuario}/${id}.json`;
+        const filePath = `./cartas/${usuario}/${id}.json`;
         fs.unlink(filePath, (err) => {
           if (err) {
             if (err.code === "ENOENT") {
@@ -185,12 +182,12 @@ export const EliminarCarta = (
             }
           } else {
             callback(
-              `Carta con ID ${id} eliminada y archivo ${filePath} borrado con éxito.`,
               undefined,
+              `Carta con ID ${id} eliminada y archivo ${filePath} borrado con éxito.`,
             );
           }
         });
-        const directorioUsuario = `./src/EjerciciosCarta/usuarios`;
+        const directorioUsuario = `./cartas`;
         const userFolderPath = path.resolve(directorioUsuario, usuario);
         fs.readdir(userFolderPath, (err, filesInFolder) => {
           if (err) {
@@ -216,6 +213,57 @@ export const EliminarCarta = (
             }
           }
         });
+      } else {
+        callback(
+          `No existe ninguna carta con ID ${id} en la colección.`,
+          undefined,
+        );
+      }
+    }
+  });
+};
+
+/**
+ * Función para actualizar una carta en la colección del usuario.
+ * @param usuario Nombre del usuario.
+ * @param id ID de la carta a actualizar.
+ * @param nuevosDatos Nuevos datos de la carta.
+ * @param callback Función de retorno de llamada.
+ */
+export const ActualizarCarta = (
+  usuario: string,
+  id: number,
+  nuevaCarta: Carta,
+  callback: (error: string | undefined, data: string | undefined) => void,
+) => {
+  CargarCartas(usuario, (error, coleccion) => {
+    if (error) {
+      callback(error, undefined);
+    } else {
+      // Buscar la carta con el ID especificado
+      const cartascoleccion: Carta[] = coleccion as Carta[];
+      const index: number = cartascoleccion.findIndex(
+        (carta) => carta.id === id,
+      );
+      if (index !== -1) {
+        // Si se encontró la carta, se modifica
+        cartascoleccion[index] = nuevaCarta;
+        // Guardar la carta modificada
+        const rutaCarta = `./cartas/${usuario}/${id}.json`;
+        fs.writeFile(
+          rutaCarta,
+          JSON.stringify(cartascoleccion[index]),
+          (err) => {
+            if (err) {
+              callback(`Error al guardar la carta: ${err.message}`, undefined);
+            } else {
+              callback(
+                undefined,
+                `Se actualizado correctamente en el usuario: ${usuario} con ${nuevaCarta.id}`,
+              );
+            }
+          },
+        );
       } else {
         callback(
           `No existe ninguna carta con ID ${id} en la colección.`,
