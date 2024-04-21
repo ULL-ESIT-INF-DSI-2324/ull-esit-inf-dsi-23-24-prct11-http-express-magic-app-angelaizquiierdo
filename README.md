@@ -359,7 +359,12 @@ Una de las dificultades qe me encontre durante la realización de la práctica f
 
 # Bibliografia 
 
+
+https://mauriciogc.medium.com/express-parte-ii-peticiones-http-get-put-post-delete-bac2b9670dd
+
 https://stackoverflow.com/questions/72723644/parsing-body-from-request-to-class-in-express
 
 https://nodejs.org/docs/latest/api/fs.html
+
+
 
