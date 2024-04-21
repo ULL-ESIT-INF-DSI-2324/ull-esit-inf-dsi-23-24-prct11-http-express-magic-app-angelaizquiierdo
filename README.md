@@ -4,9 +4,8 @@
 
 ## Indice
 
-
-
 ## Introducción
+
 Basado en práctica 10 de servidor-cliente de API para coleccionistas de cartas Magic, usando **Express** para gestionar las carta mágicas con las funciones implementadas mediante funciones callback de forma asincrona el sistema de gestion de ficheros. Las peticiones que podrá realizar el cliente al servidor deberán permitir añadir, modificar, eliminar, listar y mostrar cartas de un usuario concreto. El servidor Express deberá almacenar la información de las cartas como ficheros JSON en el sistema de ficheros, siguiendo la misma estructura de directorios utilizada durante prácticas pasadas.
 
 ## Desarrollo de la práctica
@@ -65,12 +64,12 @@ export const ActualizarCarta = (
             }
           },
         );
-      
+
 ...
 
 ```
 
-### Como el guión describe 
+### Como el guión describe
 
 > Todas las peticiones deberán llevarse a cabo a partir de la ruta `/cards` y, además, deberán utilizarse los siguientes verbos HTTP para definir la manera en la que el servidor atenderá cada petición hecha en la ruta anterior:
 
@@ -83,12 +82,13 @@ export const ActualizarCarta = (
 - patch: Para modificar la información de una carta existente en la colección de un usuario. En este caso, el ID de la carta que se desea modificar vendrá dado, junto al usuario, como parámetros de la query string de la petición. Además, la información a modificar se especificará en formato JSON en el cuerpo de la petición.
 
 ###
-Dando como resultado este código: 
+
+Dando como resultado este código:
+
 ```ts
 const app = express();
 
 app.use(express.json());
-
 
 app.get("/cards", (req, res) => {
   if (!req.query.usuario) {
@@ -181,7 +181,6 @@ app.delete("/cards", (req, res) => {
   }
 });
 
-
 app.patch("/cards", (req, res) => {
   if (!req.query.usuario) {
     res.send({
@@ -233,7 +232,7 @@ app.listen(3000, () => {
 });
 ```
 
-Se procede a explicar la estructura que sigo en las peticiones HTTP con Express en este caso es una estructura clara y bien organizada que sigue los principios de enrutamiento y manejo de solicitudes de Express. 
+Se procede a explicar la estructura que sigo en las peticiones HTTP con Express en este caso es una estructura clara y bien organizada que sigue los principios de enrutamiento y manejo de solicitudes de Express.
 
 En primer lugar, inicializamos una instancia de Express para crear nuestro servidor. Luego, establecemos una ruta en **./cards** para manejar diversas solicitudes HTTP.
 
@@ -241,13 +240,12 @@ Asociamos diferentes tipos de solicitudes con esta ruta para realizar acciones e
 
 Para la solicitud GET, verificamos el número de parámetros en la query string para discernir entre realizar la acción de `MostrarCarta` o `CargarCartas`. Si se busca visualizar una carta específica, examinamos el campo **'id'** en la **query string** para identificarla.
 
-Todas las respuestas del servidor están en formato JSON y siguen la misma estructura 
-`{ status, answer }`. 
+Todas las respuestas del servidor están en formato JSON y siguen la misma estructura
+`{ status, answer }`.
 El campo **status**: indica si la operación fue exitosa o si ocurrió un error.
-El campo **answer**: proporciona detalles adicionales o el resultado de la operación, en el caso de las solicitudes GET donde se llama a la funcion **JSON.stringify**  objeto `Carta` o `Carta[]` en una cadena JSON.
+El campo **answer**: proporciona detalles adicionales o el resultado de la operación, en el caso de las solicitudes GET donde se llama a la funcion **JSON.stringify** objeto `Carta` o `Carta[]` en una cadena JSON.
 
 He implementado una función denominada `ConversiorJSONaCarta` con el propósito de convertir objetos JSON provenientes del **body** de las solicitudes en instancias de la clase Carta. Esta abstracción resulta sumamente útil para gestionar datos en formato JSON en las solicitudes entrantes del servidor, facilitando así su manipulación como objetos dentro del código. Este enfoque, además de proporcionar una mayor robustez a la aplicación, simplifica el proceso de recepción y manipulación de datos.
-
 
 ```ts
 export function ConversiorJSONaCarta(
@@ -278,6 +276,90 @@ export function ConversiorJSONaCarta(
 }
 ```
 
-Y realice las pruebas unitarias del servidor 
+Y por ultimo se realizo las prubas unitarias de los distintas peticiones con request.
+
+```ts
+describe("Pruebas de las rutas de la aplicación Express", () => {
+  // Prueba para la ruta GET /cards
+  it("Test 1 - get (no debería funcionar si el usuario no se da en la query string)", (done) => {
+    request.get(
+      { url: "http://localhost:3000/cards", json: true },
+      (error: Error, response) => {
+        expect(response.body.status).to.equal("ERROR");
+        expect(response.body.answer).to.equal(
+          "Falta parametro de usuario en la solicitud",
+        );
+        done();
+      },
+    );
+  });
+
+  it("Test 2 - get (debería obtener todas las cartas de un usuario)", (done) => {
+    request.get(
+      { url: "http://localhost:3000/cards?usuario=eva", json: true },
+      (error: Error, response) => {
+        expect(response.body.status).to.equal("EXITO");
+
+        done();
+      },
+    );
+  });
+
+  it("Test 3 - get (debería obtener una carta de un usuario)", (done) => {
+    request.get(
+      { url: "http://localhost:3000/cards?usuario=eva&id=6", json: true },
+      (error: Error, response) => {
+        expect(response.body.status).to.equal("EXITO");
+        done();
+      },
+    );
+  });
+
+  // Prueba para la ruta POST /cards
+  it("Test 4 - post (no debería funcionar si el usuario no se da en la query string)", (done) => {
+    request.post(
+      { url: "http://localhost:3000/cards", json: true },
+      (error: Error, response) => {
+        expect(response.body.status).to.equal("ERROR");
+        expect(response.body.answer).to.equal(
+          "Falta parametro de usuario en la solicitud",
+        );
+        done();
+      },
+    );
+  });
+  it("Test 5 - post (debería añadir una carta a un usuario)", (done) => {
+    const cardToAdd = {
+      id: 7,
+      nombre: "Pokemon-Pikachu",
+      costemana: 5,
+      color: "Rojo",
+      lineatipo: "Instantaneo",
+      rareza: "Rara",
+      reglas:
+        "Objetivo del juego: El objetivo principal es reducir los puntos de vida del oponente a cero. Cada jugador comienza con 20 puntos de vida",
+      valorMercado: 50,
+    };
+    request.post(
+      { url: "http://localhost:3000/cards?usuario=eva", json: cardToAdd },
+      (error: Error, response) => {
+        expect(response.body.status).to.equal("EXITO");
+        done();
+      },
+    );
+  });
+  ...
+```
 
 # Conclusion
+
+En conclusion, está práctica me ha ayudado a entender la imprementación de servidor HTTP utilizando Express, asímismo he entendido el significado y la aplicación práctica de los distintos verbos HTTP(GET,POST, DELETE, PATCH), así como la importancia de emplear adecuadamente el patrón callback siendo más estructurada y facil de redirigir información de salida al cliente. 
+
+Una de las dificultades qe me encontre durante la realización de la práctica fue la conversion formato JSON en objetos de tipo `Carta`. Inicialmente, no estaba claro por qué se requería un conversor para realizar esta tarea, y tuve dificultades ya que no se me guardaba nada solo se creaba el fichero. Y no sabia como implementarlo asi que busque recursos y supe realizar el ejercicio.
+
+# Bibliografia 
+
+https://stackoverflow.com/questions/72723644/parsing-body-from-request-to-class-in-express
+
+https://nodejs.org/docs/latest/api/fs.html
+
