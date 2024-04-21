@@ -19,10 +19,10 @@ import {
 const usuariotest = "Juan";
 
 // Ruta del directorio de cartas y archivo a eliminar
-const directorioCartasUsuario = "./cartas/Juan";
+const directorioCartasUsuario = "./cards/Juan";
 const archivoAEliminar = `${directorioCartasUsuario}/1.json`;
 
-// Eliminar el archivo 7.json antes de que comiencen las pruebas
+// Eliminar el archivo 1.json antes de que comiencen las pruebas
 before((done) => {
   fs.unlink(archivoAEliminar, (err) => {
     if (err) {
@@ -103,6 +103,28 @@ describe("GuardarCarta", () => {
       done();
     });
   });
+
+  it("Test 4 - debería guardar otra carta correctamente", (done) => {
+    const Dragon: Carta = new Carta(
+      4,
+      "Dragón de Ojos Azules",
+      8,
+      Color.Incoloro,
+      LineaTipo.Criatura,
+      Rareza.Mitica,
+      "Cuando el Dragón de Ojos Azules entra al campo de batalla, puedes invocar a un Dragón Blanco de Ojos Azules desde tu mano, tu mazo o tu cementerio",
+      3000,
+      2500,
+      undefined,
+      1000,
+    );
+
+    GuardarCarta(usuariotest, Dragon, (err, data) => {
+      expect(err).to.equal("El archivo para la carta Dragón de Ojos Azules ya existe");
+      expect(data).to.undefined;
+      done();
+    });
+  });
 });
 
 describe("CargarCartas", () => {
@@ -119,7 +141,7 @@ describe("CargarCartas", () => {
 
     CargarCartas(usuarioInexistente, (err, coleccioncartas) => {
       expect(err).to.equal(
-        `Error al cargar las cartas del usuario: ENOENT: no such file or directory, access './cartas/UsuarioInexistente'`,
+        `Error al cargar las cartas del usuario: ENOENT: no such file or directory, access './cards/UsuarioInexistente'`,
       );
       done();
     });
@@ -184,7 +206,7 @@ describe("ActualizarCarta", () => {
   });
 
   it("Test 2 - no debería actualizar una carta si no existe", (done) => {
-    const id_nuevo = 999; // ID de la carta que no existe
+    const id_nuevo = 8; // ID de la carta que no existe
     const nuevaCarta: Carta = new Carta(
       id_nuevo,
       "Nueva carta",
@@ -200,13 +222,7 @@ describe("ActualizarCarta", () => {
     );
     ActualizarCarta(usuariotest, id_nuevo, nuevaCarta, (err, data) => {
       console.log(err);
-      expect(err).to.equal(
-        `Error al convertir el JSON del archivo 1.json: expected 'No existe ninguna carta con ID 999 en…' to equal 'Error al convertir el JSON del archiv…'`,
-      );
-      // expect(err).to.be.undefined;
-      // expect(data).to.equal(
-      //   `No existe ninguna carta con ID ${id} en la colección.`,
-      // );
+      expect(err).to.equal(`No existe este usuario ${usuariotest}`);
       done();
     });
   });
@@ -239,7 +255,7 @@ describe("ActualizarCarta", () => {
 describe("EliminarCarta", () => {
   it("Test 1 - debería eliminar una carta correctamente", (done) => {
     const id = 1; // ID de la carta que deseas eliminar
-    const filePath = `./cartas/${usuariotest}/${id}.json`;
+    const filePath = `./cards/${usuariotest}/${id}.json`;
     EliminarCarta(usuariotest, id, (err, data) => {
       expect(err).to.be.undefined;
       expect(data).to.equal(

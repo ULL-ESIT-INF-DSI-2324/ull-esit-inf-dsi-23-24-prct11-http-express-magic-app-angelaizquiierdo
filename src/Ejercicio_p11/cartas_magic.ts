@@ -113,6 +113,12 @@ export class Carta implements Interfazcarta {
   textoReglas: string;
 }
 
+
+/**
+ * Funcion que convierte un objeto JSON en un objeto de carta.
+ * @param nueva_carta  El objeto JSON que contiene la información de la carta.
+ * @param callback  La función de retorno que se llamará cuando se complete la conversión.
+ */
 export function ConversiorJSONaCarta(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   nueva_carta: any,

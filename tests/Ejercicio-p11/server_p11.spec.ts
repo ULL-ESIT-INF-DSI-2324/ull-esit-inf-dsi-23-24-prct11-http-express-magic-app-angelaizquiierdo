@@ -4,7 +4,7 @@ import { expect } from "chai";
 import request from "request";
 
 // Ruta del directorio de cartas y archivo a eliminar
-const directorioCartasUsuario = "./cartas/eva";
+const directorioCartasUsuario = "./cards/eva";
 const archivoAEliminar = `${directorioCartasUsuario}/7.json`;
 
 // Eliminar el archivo 7.json antes de que comiencen las pruebas
@@ -19,9 +19,9 @@ before((done) => {
 
 describe("Pruebas de las rutas de la aplicación Express", () => {
   // Prueba para la ruta GET /cards
-  it("Test 1 - no debería funcionar si el usuario no se da en la query string", (done) => {
+  it("Test 1 - get (no debería funcionar si el usuario no se da en la query string)", (done) => {
     request.get(
-      { url: "http://localhost:3000/cartas", json: true },
+      { url: "http://localhost:3000./cards", json: true },
       (error: Error, response) => {
         expect(response.body.status).to.equal("ERROR");
         expect(response.body.answer).to.equal("Se necesita el usuario");
@@ -29,18 +29,21 @@ describe("Pruebas de las rutas de la aplicación Express", () => {
       },
     );
   });
-  it("Test 2 - debería obtener todas las cartas de un usuario", (done) => {
+
+  it("Test 2 - get (debería obtener todas las cartas de un usuario)", (done) => {
     request.get(
-      { url: "http://localhost:3000/cartas?usuario=eva", json: true },
+      { url: "http://localhost:3000./cards?usuario=eva", json: true },
       (error: Error, response) => {
         expect(response.body.status).to.equal("EXITO");
+
         done();
       },
     );
   });
-  it("Test 3 - debería obtener una carta de un usuario", (done) => {
+
+  it("Test 3 - get (debería obtener una carta de un usuario)", (done) => {
     request.get(
-      { url: "http://localhost:3000/cartas?usuario=eva&id=6", json: true },
+      { url: "http://localhost:3000./cards?usuario=eva&id=6", json: true },
       (error: Error, response) => {
         expect(response.body.status).to.equal("EXITO");
         done();
@@ -49,9 +52,9 @@ describe("Pruebas de las rutas de la aplicación Express", () => {
   });
 
   // Prueba para la ruta POST /cards
-  it("Test 4 - no debería funcionar si el usuario no se da en la query string", (done) => {
+  it("Test 4 - post (no debería funcionar si el usuario no se da en la query string)", (done) => {
     request.post(
-      { url: "http://localhost:3000/cartas", json: true },
+      { url: "http://localhost:3000./cards", json: true },
       (error: Error, response) => {
         expect(response.body.status).to.equal("ERROR");
         expect(response.body.answer).to.equal(
@@ -61,7 +64,7 @@ describe("Pruebas de las rutas de la aplicación Express", () => {
       },
     );
   });
-  it("Test 5 - debería añadir una carta a un usuario", (done) => {
+  it("Test 5 - post (debería añadir una carta a un usuario)", (done) => {
     const cardToAdd = {
       id: 7,
       nombre: "Pokemon-Pikachu",
@@ -74,7 +77,7 @@ describe("Pruebas de las rutas de la aplicación Express", () => {
       valorMercado: 50,
     };
     request.post(
-      { url: "http://localhost:3000/cartas?usuario=eva", json: cardToAdd },
+      { url: "http://localhost:3000./cards?usuario=eva", json: cardToAdd },
       (error: Error, response) => {
         expect(response.body.status).to.equal("EXITO");
         done();
@@ -95,7 +98,7 @@ describe("Pruebas de las rutas de la aplicación Express", () => {
     };
 
     request.post(
-      { url: "http://localhost:3000/cartas?usuario=eva", json: cardToAdd },
+      { url: "http://localhost:3000./cards?usuario=eva", json: cardToAdd },
       (error: Error, response) => {
         expect(response.body.status).to.equal("EXITO");
         done();
@@ -117,7 +120,7 @@ describe("Pruebas de las rutas de la aplicación Express", () => {
     };
 
     request.post(
-      { url: "http://localhost:3000/cartas?usuario=eva", json: cardToAdd },
+      { url: "http://localhost:3000./cards?usuario=eva", json: cardToAdd },
       (error: Error, response) => {
         expect(response.body.status).to.equal("ERROR");
         expect(response.body.answer).to.equal(
@@ -131,7 +134,7 @@ describe("Pruebas de las rutas de la aplicación Express", () => {
   // Prueba para la ruta DELETE /cards
   it("Test 8 - no debería funcionar si el usuario no se da en la query string", (done) => {
     request.delete(
-      { url: "http://localhost:3000/cartas", json: true },
+      { url: "http://localhost:3000./cards", json: true },
       (error: Error, response) => {
         expect(response.body.status).to.equal("ERROR");
         expect(response.body.answer).to.equal(
@@ -143,11 +146,11 @@ describe("Pruebas de las rutas de la aplicación Express", () => {
   });
   it("Test 9 - debería eliminar una carta de un usuario", (done) => {
     request.delete(
-      { url: "http://localhost:3000/cartas?usuario=eva&id=4", json: true },
+      { url: "http://localhost:3000./cards?usuario=eva&id=4", json: true },
       (error: Error, response) => {
         expect(response.body.status).to.equal("EXITO");
         expect(response.body.answer).to.equal(
-          "Carta con ID 4 eliminada y archivo ./cartas/eva/4.json borrado con éxito.",
+          "Carta con ID 4 eliminada y archivo ./cards/eva/4.json borrado con éxito.",
         );
         done();
       },
@@ -155,7 +158,7 @@ describe("Pruebas de las rutas de la aplicación Express", () => {
   });
   it("Test 10 - no debería eliminar una carta de un usuario si no existe", (done) => {
     request.delete(
-      { url: "http://localhost:3000/cartas?usuario=eva&id=999", json: true },
+      { url: "http://localhost:3000./cards?usuario=eva&id=999", json: true },
       (error: Error, response) => {
         expect(response.body.status).to.equal("ERROR");
         expect(response.body.answer).to.equal(
@@ -169,7 +172,7 @@ describe("Pruebas de las rutas de la aplicación Express", () => {
   // Prueba para la ruta PATCH /cards
   it("Test 11 - no debería funcionar si el usuario no se da en la query string", (done) => {
     request.patch(
-      { url: "http://localhost:3000/cartas", json: true },
+      { url: "http://localhost:3000./cards", json: true },
       (error: Error, response) => {
         expect(response.body.status).to.equal("ERROR");
         expect(response.body.answer).to.equal(
@@ -193,7 +196,7 @@ describe("Pruebas de las rutas de la aplicación Express", () => {
     };
 
     request.patch(
-      { url: "http://localhost:3000/cartas?usuario=eva&id=6", json: cardToAdd },
+      { url: "http://localhost:3000./cards?usuario=eva&id=6", json: cardToAdd },
       (error: Error, response) => {
         expect(response.body.status).to.equal("EXITO");
         expect(response.body.answer).to.equal(
@@ -216,7 +219,7 @@ describe("Pruebas de las rutas de la aplicación Express", () => {
     };
     request.patch(
       {
-        url: "http://localhost:3000/cartas?usuario=eva&id=99",
+        url: "http://localhost:3000./cards?usuario=eva&id=99",
         json: cardToAdd,
       },
       (error: Error, response) => {

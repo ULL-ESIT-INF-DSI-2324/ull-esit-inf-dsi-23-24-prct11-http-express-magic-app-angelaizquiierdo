@@ -4,16 +4,22 @@ import path from "path";
 
 /**
  * Función para guardar una carta en la colección del usuario.
+ * Primero verifica si el archivo de la carta ya existe.
+ * Si el archivo ya existe, llama a la función de retorno de llamada con un mensaje de error.
+ * Llama a la función de fs.mkdir para crear el directorio del usuario.
+ * Llama a la función de fs.writeFile para escribir la carta en el directorio del usuario.
+ * Llama a la función de retorno de llamada con un mensaje de error o éxito.
  * @param usuario Nombre del usuario.
  * @param carta Carta a guardar.
  * @param callback Función de retorno de llamada.
+ * @returns void No devuelve nada, pero llama a la función de retorno de llamada con un mensaje de error o éxito
  */
 export const GuardarCarta = (
   usuario: string,
   carta: Carta,
   callback: (err: string | undefined, data: string | undefined) => void,
 ) => {
-  const directorioUsuario = `./cartas/${usuario}`;
+  const directorioUsuario = `./cards/${usuario}`;
   const rutaCarta = `${directorioUsuario}/${carta.id}.json`;
 
   // Verificar si el archivo ya existe
@@ -25,7 +31,6 @@ export const GuardarCarta = (
       // Si el archivo no existe, escribirlo en el directorio del usuario
       fs.mkdir(directorioUsuario, { recursive: true }, (err) => {
         if (err) {
-          
           callback(`Error al crear el directorio: ${err.message}`, undefined);
         } else {
           fs.writeFile(rutaCarta, JSON.stringify(carta), (err) => {
@@ -46,8 +51,14 @@ export const GuardarCarta = (
 
 /**
  * Función para cargar las cartas de un usuario desde el sistema de archivos.
+ * Primero verifica si el directorio de usuario existe.
+ * Si el directorio existe, llama a la función de fs.readdir y fs.readFile y JSON.parse.
+ * Llama a la función de fs.readdir para leer el directorio de usuario.
+ * Llama a la función de fs.readFile para leer el archivo de cada carta.
+ * Llama a la función de JSON.parse para convertir el JSON de cada carta en un objeto Carta.
  * @param usuario Nombre del usuario.
  * @param callback Función de retorno de llamada.
+ * @returns void No devuelve nada, pero llama a la función de retorno de llamada con un mensaje de error o la colección de cartas
  */
 export const CargarCartas = (
   usuario: string,
@@ -56,7 +67,7 @@ export const CargarCartas = (
     coleccioncartas: Carta[] | undefined,
   ) => void,
 ) => {
-  const directorioUsuario = `./cartas/${usuario}`;
+  const directorioUsuario = `./cards/${usuario}`;
 
   fs.access(directorioUsuario, fs.constants.F_OK, (err) => {
     if (err) {
@@ -108,9 +119,15 @@ export const CargarCartas = (
 };
 
 /**
- * Funcion de mostrar la carta de un usuario con un id ya dicho
+ * Funcion de mostrar la carta de un usuario con el id especificado.
+ * Llama a la funcion de CargarCartas para cargar las cartas del usuario.
+ * Luego busca la carta con el id especificado en la coleccion de cartas.
+ * Si la carta existe, llama a la funcion de retorno de llamada con la carta, si no, llama a la funcion de retorno de llamada con un mensaje de error.
+ *
  * @param usuario Nombre del usuario.
  * @param id ID de la carta a mostrar.
+ * @param callback Función de retorno de llamada.
+ * @returns void No devuelve nada, pero llama a la función de retorno de llamada con un mensaje de error o la carta
  */
 export const MostrarCarta = (
   usuario: string,
@@ -148,9 +165,14 @@ export const MostrarCarta = (
 
 /**
  * Función para eliminar una carta de la colección del usuario.
+ * Si usuario y carta no existen, se elimina la carta y se envia un mensaje de exito, si no un mensaje de error.
+ * Llama a la funcion de fs.unlink para eliminar el archivo de la carta.
+ * Llama a la funcion de fs.readdir para leer el directorio de usuario y verificar si esta vacio.
+ * Llama a la funcion de fs.rmdir para eliminar el directorio de usuario si esta vacio.
  * @param usuario Nombre del usuario.
  * @param id ID de la carta a eliminar.
  * @param callback Función de retorno de llamada.
+ * @returns void No devuelve nada, pero llama a la función de retorno de llamada con un mensaje de error o éxito
  */
 export const EliminarCarta = (
   usuario: string,
@@ -169,7 +191,7 @@ export const EliminarCarta = (
       const index = coleccioncarta.findIndex((carta) => carta.id === id);
       if (index !== -1) {
         coleccioncarta.splice(index, 1);
-        const filePath = `./cartas/${usuario}/${id}.json`;
+        const filePath = `./cards/${usuario}/${id}.json`;
         fs.unlink(filePath, (err) => {
           if (err) {
             if (err.code === "ENOENT") {
@@ -187,7 +209,7 @@ export const EliminarCarta = (
             );
           }
         });
-        const directorioUsuario = `./cartas`;
+        const directorioUsuario = `./cards`;
         const userFolderPath = path.resolve(directorioUsuario, usuario);
         fs.readdir(userFolderPath, (err, filesInFolder) => {
           if (err) {
@@ -225,10 +247,13 @@ export const EliminarCarta = (
 
 /**
  * Función para actualizar una carta en la colección del usuario.
+ * Si usuario y carta no existen, se modifica la carta y se envia un mensaje de exito, si no un mensaje de error.
+ * llama a la funcion de fs.writeFile para guardar la carta modificada.
  * @param usuario Nombre del usuario.
  * @param id ID de la carta a actualizar.
  * @param nuevosDatos Nuevos datos de la carta.
  * @param callback Función de retorno de llamada.
+ * @returns void No devuelve nada, pero llama a la función de retorno de llamada con un mensaje de error o éxito
  */
 export const ActualizarCarta = (
   usuario: string,
@@ -238,7 +263,7 @@ export const ActualizarCarta = (
 ) => {
   CargarCartas(usuario, (error, coleccion) => {
     if (error) {
-      callback(error, undefined);
+      callback(`No existe este usuario ${usuario}`, undefined);
     } else {
       // Buscar la carta con el ID especificado
       const cartascoleccion: Carta[] = coleccion as Carta[];
@@ -249,7 +274,7 @@ export const ActualizarCarta = (
         // Si se encontró la carta, se modifica
         cartascoleccion[index] = nuevaCarta;
         // Guardar la carta modificada
-        const rutaCarta = `./cartas/${usuario}/${id}.json`;
+        const rutaCarta = `./cards/${usuario}/${id}.json`;
         fs.writeFile(
           rutaCarta,
           JSON.stringify(cartascoleccion[index]),

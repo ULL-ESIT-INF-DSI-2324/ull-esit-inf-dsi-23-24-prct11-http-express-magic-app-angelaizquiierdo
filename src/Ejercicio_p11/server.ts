@@ -18,11 +18,11 @@ app.use(express.json());
  * En este caso, el ID de la tarjeta se proporcionará, junto con el usuario, como parámetros en la cadena de consulta de la solicitud.
  * Si no se especifica un ID específico indica que se desea la colección completa de tarjetas para el usuario.
  */
-app.get("/cartas", (req, res) => {
+app.get("/cards", (req, res) => {
   if (!req.query.usuario) {
     res.send({
       status: "ERROR",
-      answer: "Se necesita el usuario",
+      answer: "Falta parametro de usuario en la solicitud",
     });
     return;
   }
@@ -59,7 +59,7 @@ app.get("/cartas", (req, res) => {
  * En este caso, la tarjeta que se agregará a la colección deberá especificarse en formato JSON en el cuerpo de la solicitud.
  * El usuario debe estar indicado en la cadena de consulta de la solicitud.
  */
-app.post("/cartas", (req, res) => {
+app.post("/cards", (req, res) => {
   if (!req.query.usuario) {
     res.send({
       status: "ERROR",
@@ -90,7 +90,7 @@ app.post("/cartas", (req, res) => {
  * Elimina una tarjeta de la colección de un usuario.
  * En este caso, el ID de la tarjeta a eliminar se proporcionará, junto con el usuario, como parámetros en la cadena de consulta de la solicitud.
  */
-app.delete("/cartas", (req, res) => {
+app.delete("/cards", (req, res) => {
   if (!req.query.usuario) {
     res.send({
       status: "ERROR",
@@ -123,7 +123,7 @@ app.delete("/cartas", (req, res) => {
  * En este caso, el ID de la tarjeta a modificar se proporcionará, junto con el usuario, como parámetros en la cadena de consulta de la solicitud.
  *Adicionalmente la información a modificar se especificará en formato JSON en el cuerpo de la solicitud.
  */
-app.patch("/cartas", (req, res) => {
+app.patch("/cards", (req, res) => {
   if (!req.query.usuario) {
     res.send({
       status: "ERROR",
